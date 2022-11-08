@@ -1,10 +1,20 @@
 import 'package:flutter/material.dart';
 
-import 'home_screen.dart';
 import 'log_in_screen.dart';
 
-class RegisterScreen extends StatelessWidget {
+class RegisterScreen extends StatefulWidget {
   const RegisterScreen({Key? key}) : super(key: key);
+
+  @override
+  State<RegisterScreen> createState() => _RegisterScreenState();
+}
+
+class _RegisterScreenState extends State<RegisterScreen> {
+  final _formKey = GlobalKey<FormState>();
+  String phoneNumber = '';
+  String email = '';
+  String password = '';
+  bool hidePassword = true;
 
   @override
   Widget build(BuildContext context) {
@@ -35,103 +45,142 @@ class RegisterScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 10),
-            Row(
-              children: [
-                const Icon(
-                  Icons.phone_outlined,
-                  color: Color(0xff959ca9),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: TextField(
-                    decoration: InputDecoration(
-                      hintText: 'Phone Number',
-                      hintStyle: const TextStyle(
-                          color: Colors.grey,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 1),
-                      contentPadding: EdgeInsets.zero,
-                      focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(
-                          color: Colors.grey.shade300,
-                        ),
-                      ),
-                      enabledBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(
-                          color: Colors.grey.shade300,
-                        ),
-                      ),
-                    ),
-                  ),
-                )
-              ],
-            ),
-            const SizedBox(height: 20),
-            Row(
-              children: [
-                const Icon(
-                  Icons.email_outlined,
-                  color: Color(0xff959ca9),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: TextField(
-                    decoration: InputDecoration(
-                      hintText: 'Email',
-                      hintStyle: const TextStyle(
-                          color: Colors.grey,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 1),
-                      contentPadding: EdgeInsets.zero,
-                      focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(
-                          color: Colors.grey.shade300,
-                        ),
-                      ),
-                      enabledBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(
-                          color: Colors.grey.shade300,
-                        ),
-                      ),
-                    ),
-                  ),
-                )
-              ],
-            ),
-            const SizedBox(height: 20),
-            Row(
-              children: [
-                const Icon(
-                  Icons.lock_outline,
-                  color: Color(0xff959ca9),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: TextField(
-                    decoration: InputDecoration(
-                      suffixIcon: const Icon(
-                        Icons.visibility_off_outlined,
+            Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.phone_outlined,
                         color: Color(0xff959ca9),
                       ),
-                      hintText: 'Password',
-                      hintStyle: const TextStyle(
-                          color: Colors.grey,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 1),
-                      focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(
-                          color: Colors.grey.shade300,
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: TextFormField(
+                          keyboardType: TextInputType.phone,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Enter your phone number';
+                            }
+                            if (isNumeric(value) == false) {
+                              return 'Must contain only numbers';
+                            }
+                            return null;
+                          },
+                          decoration: InputDecoration(
+                            hintText: 'Phone Number',
+                            hintStyle: const TextStyle(
+                                color: Colors.grey,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 1),
+                            contentPadding: EdgeInsets.zero,
+                            focusedBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Colors.grey.shade300,
+                              ),
+                            ),
+                            enabledBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Colors.grey.shade300,
+                              ),
+                            ),
+                          ),
+                          onChanged: (val) => phoneNumber = val,
                         ),
-                      ),
-                      enabledBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(
-                          color: Colors.grey.shade300,
-                        ),
-                      ),
-                    ),
+                      )
+                    ],
                   ),
-                )
-              ],
+                  const SizedBox(height: 20),
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.email_outlined,
+                        color: Color(0xff959ca9),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: TextFormField(
+                          keyboardType: TextInputType.emailAddress,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Enter your email';
+                            }
+                            return null;
+                          },
+                          decoration: InputDecoration(
+                            hintText: 'Email',
+                            hintStyle: const TextStyle(
+                                color: Colors.grey,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 1),
+                            contentPadding: EdgeInsets.zero,
+                            focusedBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Colors.grey.shade300,
+                              ),
+                            ),
+                            enabledBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Colors.grey.shade300,
+                              ),
+                            ),
+                          ),
+                          onChanged: (val) => email = val,
+                        ),
+                      )
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.lock_outline,
+                        color: Color(0xff959ca9),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: TextFormField(
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Enter your password';
+                            }
+                            return null;
+                          },
+                          obscureText: hidePassword,
+                          decoration: InputDecoration(
+                            suffixIcon: GestureDetector(
+                              onTap: () => setState(() {
+                                hidePassword = !hidePassword;
+                              }),
+                              child: const Icon(
+                                Icons.visibility_off_outlined,
+                                color: Color(0xff959ca9),
+                              ),
+                            ),
+                            hintText: 'Password',
+                            hintStyle: const TextStyle(
+                                color: Colors.grey,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 1),
+                            focusedBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Colors.grey.shade300,
+                              ),
+                            ),
+                            enabledBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Colors.grey.shade300,
+                              ),
+                            ),
+                          ),
+                          onChanged: (val) => password = val,
+                        ),
+                      )
+                    ],
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 50),
             SizedBox(
@@ -141,7 +190,7 @@ class RegisterScreen extends StatelessWidget {
                   padding: MaterialStateProperty.all(
                       const EdgeInsets.symmetric(vertical: 15)),
                   backgroundColor: MaterialStateProperty.all(
-                    const Color(0xff0165ff),
+                    const Color(0xff6C63FF),
                   ),
                   shape: MaterialStateProperty.all(
                     RoundedRectangleBorder(
@@ -149,12 +198,19 @@ class RegisterScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-                onPressed: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const HomeScreen(),
-                  ),
-                ),
+                // onPressed: () => Navigator.push(
+                //   context,
+                //   MaterialPageRoute(
+                //     builder: (context) => const HomeScreen(),
+                //   ),
+                // ),
+                onPressed: () {
+                  if (_formKey.currentState!.validate()) {
+                    print(phoneNumber);
+                    print(email);
+                    print(password);
+                  }
+                },
                 child: const Text(
                   'Continue',
                   style: TextStyle(letterSpacing: 1),
@@ -183,7 +239,7 @@ class RegisterScreen extends StatelessWidget {
                       TextSpan(
                         text: 'Log In',
                         style: TextStyle(
-                          color: Colors.blue,
+                          color: Color(0xff6C63FF),
                           fontSize: 15,
                           fontWeight: FontWeight.bold,
                         ),
@@ -198,4 +254,11 @@ class RegisterScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+bool isNumeric(String? s) {
+  if (s == null) {
+    return false;
+  }
+  return double.tryParse(s) != null;
 }
