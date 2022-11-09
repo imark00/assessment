@@ -1,3 +1,4 @@
+import 'package:assessment/utils/utils.dart';
 import 'package:flutter/material.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -48,6 +49,7 @@ class SettingsScreen extends StatelessWidget {
                       text: 'Log out',
                       textColor: Colors.red[400],
                       chevronColor: Colors.red[400],
+                      onTap: signOut,
                     ),
                     const SizedBox(height: 20),
                   ],

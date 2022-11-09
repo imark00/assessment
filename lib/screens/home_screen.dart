@@ -2,6 +2,9 @@ import 'package:assessment/screens/profile_screen.dart';
 import 'package:assessment/screens/settings_screen.dart';
 import 'package:flutter/material.dart';
 
+import 'buddies_screen.dart';
+import 'discover_screen.dart';
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
@@ -27,9 +30,10 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: selectedIndex,
-        unselectedItemColor: Colors.black,
-        selectedItemColor: Colors.red,
-        backgroundColor: Colors.white,
+        unselectedItemColor: Colors.grey.shade700,
+        selectedItemColor: Colors.white,
+        backgroundColor: const Color(0xff15151f),
+        //  backgroundColor: Colors.white,
         elevation: 0,
         type: BottomNavigationBarType.fixed,
         items: const [
@@ -56,30 +60,6 @@ class _HomeScreenState extends State<HomeScreen> {
           selectedIndex = index;
         }),
       ),
-    );
-  }
-}
-
-class BuddiesScreen extends StatelessWidget {
-  const BuddiesScreen({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      backgroundColor: Colors.white,
-      body: Center(child: Text('Ignore')),
-    );
-  }
-}
-
-class DiscoverScreen extends StatelessWidget {
-  const DiscoverScreen({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      backgroundColor: Colors.white,
-      body: Center(child: Text('Ignore')),
     );
   }
 }

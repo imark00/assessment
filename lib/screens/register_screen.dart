@@ -1,5 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import 'home_screen.dart';
 import 'log_in_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -11,6 +13,7 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
+  FirebaseAuth auth = FirebaseAuth.instance;
   String phoneNumber = '';
   String email = '';
   String password = '';
@@ -204,11 +207,33 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 //     builder: (context) => const HomeScreen(),
                 //   ),
                 // ),
-                onPressed: () {
+                onPressed: () async {
                   if (_formKey.currentState!.validate()) {
-                    print(phoneNumber);
-                    print(email);
-                    print(password);
+                    try {
+                      UserCredential userCredential = await FirebaseAuth
+                          .instance
+                          .createUserWithEmailAndPassword(
+                              email: email, password: password);
+                      await userCredential.user!.updatePhoneNumber(
+                          phoneNumber as PhoneAuthCredential);
+                      debugPrint('$userCredential');
+                      if (!mounted) return;
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const HomeScreen(),
+                        ),
+                      );
+                    } on FirebaseAuthException catch (e) {
+                      if (e.code == 'weak-password') {
+                        debugPrint('The password provided is too weak.');
+                      } else if (e.code == 'email-already-in-use') {
+                        debugPrint(
+                            'The account already exists for that email.');
+                      }
+                    } catch (e) {
+                      debugPrint('$e');
+                    }
                   }
                 },
                 child: const Text(

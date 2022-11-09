@@ -1,6 +1,9 @@
-import 'package:assessment/screens/home_screen.dart';
 import 'package:assessment/screens/register_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:loader_overlay/loader_overlay.dart';
+
+import 'home_screen.dart';
 
 class LogInScreen extends StatefulWidget {
   const LogInScreen({Key? key}) : super(key: key);
@@ -10,6 +13,13 @@ class LogInScreen extends StatefulWidget {
 }
 
 class _LogInScreenState extends State<LogInScreen> {
+  final _formKey = GlobalKey<FormState>();
+  FirebaseAuth auth = FirebaseAuth.instance;
+
+  String email = '';
+  String password = '';
+
+  bool hidePassword = true;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -39,71 +49,99 @@ class _LogInScreenState extends State<LogInScreen> {
               ),
             ),
             const SizedBox(height: 10),
-            Row(
-              children: [
-                const Icon(
-                  Icons.alternate_email_outlined,
-                  color: Color(0xff959ca9),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: TextField(
-                    decoration: InputDecoration(
-                      hintText: 'Email or Phone Number',
-                      hintStyle: const TextStyle(
-                          color: Colors.grey,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 1),
-                      contentPadding: EdgeInsets.zero,
-                      focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(
-                          color: Colors.grey.shade300,
-                        ),
-                      ),
-                      enabledBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(
-                          color: Colors.grey.shade300,
-                        ),
-                      ),
-                    ),
-                  ),
-                )
-              ],
-            ),
-            const SizedBox(height: 20),
-            Row(
-              children: [
-                const Icon(
-                  Icons.lock_outline,
-                  color: Color(0xff959ca9),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: TextField(
-                    decoration: InputDecoration(
-                      suffixIcon: const Icon(
-                        Icons.visibility_off_outlined,
+            Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.alternate_email_outlined,
                         color: Color(0xff959ca9),
                       ),
-                      hintText: 'Password',
-                      hintStyle: const TextStyle(
-                          color: Colors.grey,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 1),
-                      focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(
-                          color: Colors.grey.shade300,
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: TextFormField(
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Enter your email';
+                            }
+                            return null;
+                          },
+                          decoration: InputDecoration(
+                            hintText: 'Email',
+                            hintStyle: const TextStyle(
+                                color: Colors.grey,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 1),
+                            contentPadding: EdgeInsets.zero,
+                            focusedBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Colors.grey.shade300,
+                              ),
+                            ),
+                            enabledBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Colors.grey.shade300,
+                              ),
+                            ),
+                          ),
+                          onChanged: (val) => email = val,
                         ),
-                      ),
-                      enabledBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(
-                          color: Colors.grey.shade300,
-                        ),
-                      ),
-                    ),
+                      )
+                    ],
                   ),
-                )
-              ],
+                  const SizedBox(height: 20),
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.lock_outline,
+                        color: Color(0xff959ca9),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: TextFormField(
+                          obscureText: hidePassword,
+                          keyboardType: TextInputType.text,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Enter your password';
+                            }
+                            return null;
+                          },
+                          decoration: InputDecoration(
+                            suffixIcon: GestureDetector(
+                              onTap: () => setState(() {
+                                hidePassword = !hidePassword;
+                              }),
+                              child: const Icon(
+                                Icons.visibility_off_outlined,
+                                color: Color(0xff959ca9),
+                              ),
+                            ),
+                            hintText: 'Password',
+                            hintStyle: const TextStyle(
+                                color: Colors.grey,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 1),
+                            focusedBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Colors.grey.shade300,
+                              ),
+                            ),
+                            enabledBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Colors.grey.shade300,
+                              ),
+                            ),
+                          ),
+                          onChanged: (val) => password = val,
+                        ),
+                      )
+                    ],
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 15),
             const Align(
@@ -133,12 +171,33 @@ class _LogInScreenState extends State<LogInScreen> {
                     ),
                   ),
                 ),
-                onPressed: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const HomeScreen(),
-                  ),
-                ),
+                onPressed: () async {
+                  if (_formKey.currentState!.validate()) {
+                    FocusManager.instance.primaryFocus?.unfocus();
+                    context.loaderOverlay.show();
+                    try {
+                      UserCredential? userCredential = await FirebaseAuth
+                          .instance
+                          .signInWithEmailAndPassword(
+                              email: email, password: password);
+                      debugPrint('$userCredential');
+                      if (!mounted) return;
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const HomeScreen(),
+                        ),
+                      );
+                    } on FirebaseAuthException catch (e) {
+                      if (e.code == 'user-not-found') {
+                        debugPrint('No user found for that email.');
+                      } else if (e.code == 'wrong-password') {
+                        debugPrint('Wrong password provided for that user.');
+                      }
+                    }
+                    context.loaderOverlay.hide();
+                  }
+                },
                 child: const Text(
                   'Login',
                   style: TextStyle(letterSpacing: 1),

@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -5,6 +6,7 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    User? user = FirebaseAuth.instance.currentUser;
     List<String> interests = [
       'Football',
       'Music',
@@ -89,25 +91,25 @@ class ProfileScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 20),
-              const Text(
-                '@john_doe123',
-                style: TextStyle(
+              Text(
+                '${user?.displayName}',
+                style: const TextStyle(
                   fontSize: 28,
                   color: Colors.white,
                 ),
               ),
               const SizedBox(height: 10),
-              const Text(
-                '+233551282222',
-                style: TextStyle(
+              Text(
+                '${user?.phoneNumber}',
+                style: const TextStyle(
                   fontSize: 18,
                   color: Colors.white,
                 ),
               ),
               const SizedBox(height: 10),
-              const Text(
-                'johndoe123@gmail.com',
-                style: TextStyle(
+              Text(
+                '${user?.email}',
+                style: const TextStyle(
                   fontSize: 15,
                   color: Color(0xff656573),
                 ),
